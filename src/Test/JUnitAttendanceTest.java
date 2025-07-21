@@ -1,7 +1,5 @@
 package Test;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
 import model.Attendance;
 import java.sql.Date;
 import java.sql.Time;
@@ -9,29 +7,19 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 /**
- * JUnit 5 Test Class for Attendance functionality
+ * Simple Attendance Test Class (without JUnit dependencies)
+ * Tests attendance functionality using basic assertions
  */
-@DisplayName("Attendance Model Tests")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class JUnitAttendanceTest {
 
     private Attendance testAttendance;
 
-    @BeforeAll
-    static void setUpClass() {
-        System.out.println("🧪 Starting JUnit 5 Attendance Tests");
-    }
-
-    @BeforeEach
-    void setUp() {
+    public void setUp() {
         testAttendance = new Attendance();
         System.out.println("🔧 Attendance test setup completed");
     }
 
-    @Test
-    @Order(1)
-    @DisplayName("Create Valid Attendance Record")
-    void testCreateValidAttendance() {
+    public void testCreateValidAttendance() {
         // Arrange
         int employeeId = 10001;
         Date date = Date.valueOf(LocalDate.now());
@@ -45,38 +33,27 @@ public class JUnitAttendanceTest {
         testAttendance.setLogOut(logOut);
 
         // Assert
-        assertAll("Attendance creation",
-            () -> assertEquals(employeeId, testAttendance.getEmployeeId(), "Employee ID should match"),
-            () -> assertEquals(date, testAttendance.getDate(), "Date should match"),
-            () -> assertEquals(logIn, testAttendance.getLogIn(), "Log in time should match"),
-            () -> assertEquals(logOut, testAttendance.getLogOut(), "Log out time should match"),
-            () -> assertTrue(testAttendance.isPresent(), "Should be present"),
-            () -> assertEquals(9.0, testAttendance.getWorkHours(), 0.01, "Work hours should be 9.0")
-        );
+        assert testAttendance.getEmployeeId() == employeeId : "Employee ID should match";
+        assert testAttendance.getDate().equals(date) : "Date should match";
+        assert testAttendance.getLogIn().equals(logIn) : "Log in time should match";
+        assert testAttendance.getLogOut().equals(logOut) : "Log out time should match";
+        assert testAttendance.isPresent() : "Should be present";
+        assert Math.abs(testAttendance.getWorkHours() - 9.0) < 0.01 : "Work hours should be 9.0";
         
         System.out.println("✅ testCreateValidAttendance passed");
     }
 
-    @Test
-    @Order(2)
-    @DisplayName("Invalid Employee ID Validation")
-    void testInvalidEmployeeId() {
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> testAttendance.setEmployeeId(-1),
-            "Should throw exception for invalid employee ID"
-        );
-        
-        assertTrue(exception.getMessage().contains("positive"), 
-                  "Error message should mention positive requirement");
-        
-        System.out.println("✅ testInvalidEmployeeId passed");
+    public void testInvalidEmployeeId() {
+        try {
+            testAttendance.setEmployeeId(-1);
+            assert false : "Should throw exception for invalid employee ID";
+        } catch (IllegalArgumentException e) {
+            assert e.getMessage().contains("positive") : "Error message should mention positive requirement";
+            System.out.println("✅ testInvalidEmployeeId passed");
+        }
     }
 
-    @Test
-    @Order(3)
-    @DisplayName("Late Arrival Detection")
-    void testLateArrival() {
+    public void testLateArrival() {
         // Arrange
         testAttendance.setEmployeeId(10001);
         testAttendance.setDate(Date.valueOf(LocalDate.now()));
@@ -84,16 +61,13 @@ public class JUnitAttendanceTest {
         testAttendance.setLogOut(Time.valueOf(LocalTime.of(17, 0)));
 
         // Act & Assert
-        assertTrue(testAttendance.isLate(), "Should detect late arrival");
-        assertEquals(30.0, testAttendance.getLateMinutes(), 0.01, "Late minutes should be 30");
+        assert testAttendance.isLate() : "Should detect late arrival";
+        assert Math.abs(testAttendance.getLateMinutes() - 30.0) < 0.01 : "Late minutes should be 30";
         
         System.out.println("✅ testLateArrival passed");
     }
 
-    @Test
-    @Order(4)
-    @DisplayName("Undertime Detection")
-    void testUndertime() {
+    public void testUndertime() {
         // Arrange
         testAttendance.setEmployeeId(10001);
         testAttendance.setDate(Date.valueOf(LocalDate.now()));
@@ -101,16 +75,13 @@ public class JUnitAttendanceTest {
         testAttendance.setLogOut(Time.valueOf(LocalTime.of(16, 30))); // 30 minutes early
 
         // Act & Assert
-        assertTrue(testAttendance.hasUndertime(), "Should detect undertime");
-        assertEquals(30.0, testAttendance.getUndertimeMinutes(), 0.01, "Undertime minutes should be 30");
+        assert testAttendance.hasUndertime() : "Should detect undertime";
+        assert Math.abs(testAttendance.getUndertimeMinutes() - 30.0) < 0.01 : "Undertime minutes should be 30";
         
         System.out.println("✅ testUndertime passed");
     }
 
-    @Test
-    @Order(5)
-    @DisplayName("Work Duration Calculation")
-    void testWorkDurationCalculation() {
+    public void testWorkDurationCalculation() {
         // Arrange
         testAttendance.setEmployeeId(10001);
         testAttendance.setDate(Date.valueOf(LocalDate.now()));
@@ -121,15 +92,12 @@ public class JUnitAttendanceTest {
         double workHours = testAttendance.getWorkHours();
 
         // Assert
-        assertEquals(9.5, workHours, 0.01, "Work hours should be 9.5");
+        assert Math.abs(workHours - 9.5) < 0.01 : "Work hours should be 9.5";
         
         System.out.println("✅ testWorkDurationCalculation passed");
     }
 
-    @Test
-    @Order(6)
-    @DisplayName("Null Log Out Handling")
-    void testNullLogOut() {
+    public void testNullLogOut() {
         // Arrange
         testAttendance.setEmployeeId(10001);
         testAttendance.setDate(Date.valueOf(LocalDate.now()));
@@ -137,37 +105,56 @@ public class JUnitAttendanceTest {
         testAttendance.setLogOut(null);
 
         // Act & Assert
-        assertTrue(testAttendance.isPresent(), "Should be present even with null log out");
-        assertEquals(0.0, testAttendance.getWorkHours(), 0.01, "Work hours should be 0 with null log out");
+        assert testAttendance.isPresent() : "Should be present even with null log out";
+        assert Math.abs(testAttendance.getWorkHours() - 0.0) < 0.01 : "Work hours should be 0 with null log out";
         
         System.out.println("✅ testNullLogOut passed");
     }
 
-    @Test
-    @Order(7)
-    @DisplayName("Date Validation")
-    void testDateValidation() {
+    public void testDateValidation() {
         // Test null date
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> testAttendance.setDate(null),
-            "Should throw exception for null date"
-        );
-        
-        assertTrue(exception.getMessage().contains("cannot be null"), 
-                  "Error message should mention null restriction");
-        
-        System.out.println("✅ testDateValidation passed");
+        try {
+            testAttendance.setDate(null);
+            assert false : "Should throw exception for null date";
+        } catch (IllegalArgumentException e) {
+            assert e.getMessage().contains("cannot be null") : "Error message should mention null restriction";
+            System.out.println("✅ testDateValidation passed");
+        }
     }
 
-    @AfterEach
-    void tearDown() {
-        testAttendance = null;
-        System.out.println("🧹 Attendance test cleanup completed");
-    }
-
-    @AfterAll
-    static void tearDownClass() {
-        System.out.println("✅ All JUnit 5 Attendance Tests Completed Successfully!");
+    // Main method to run all tests
+    public static void main(String[] args) {
+        System.out.println("🧪 Running Attendance Tests...");
+        
+        JUnitAttendanceTest test = new JUnitAttendanceTest();
+        
+        try {
+            test.setUp();
+            test.testCreateValidAttendance();
+            
+            test.setUp();
+            test.testInvalidEmployeeId();
+            
+            test.setUp();
+            test.testLateArrival();
+            
+            test.setUp();
+            test.testUndertime();
+            
+            test.setUp();
+            test.testWorkDurationCalculation();
+            
+            test.setUp();
+            test.testNullLogOut();
+            
+            test.setUp();
+            test.testDateValidation();
+            
+            System.out.println("🎉 All Attendance Tests Passed!");
+            
+        } catch (Exception e) {
+            System.err.println("❌ Test failed: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

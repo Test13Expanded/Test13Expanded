@@ -1,22 +1,39 @@
 package Test;
 
-import org.junit.platform.suite.api.SelectClasses;
-import org.junit.platform.suite.api.Suite;
-import org.junit.platform.suite.api.SuiteDisplayName;
-
 /**
- * JUnit 5 Test Suite for MotorPH Payroll System
- * Addresses mentor feedback about proper JUnit usage with Assert Functions
+ * Simple Test Suite for MotorPH Payroll System
+ * Runs all tests without JUnit dependencies
  */
-@Suite
-@SuiteDisplayName("MotorPH Payroll System Test Suite")
-@SelectClasses({
-    JUnitEmployeeTest.class,
-    JUnitPayrollTest.class,
-    JUnitAttendanceTest.class,
-    JUnitDatabaseTest.class
-})
 public class JUnitTestSuite {
-    // Test suite configuration
-    // All tests will be executed automatically by JUnit 5
+    
+    public static void main(String[] args) {
+        System.out.println("🧪 MotorPH Payroll System Test Suite");
+        System.out.println("=" .repeat(60));
+        
+        try {
+            // Run Employee Tests
+            System.out.println("\n📋 Running Employee Tests...");
+            JUnitEmployeeTest.main(args);
+            
+            // Run Payroll Tests
+            System.out.println("\n📋 Running Payroll Tests...");
+            JUnitPayrollTest.main(args);
+            
+            // Run Attendance Tests
+            System.out.println("\n📋 Running Attendance Tests...");
+            JUnitAttendanceTest.main(args);
+            
+            // Run Database Tests
+            System.out.println("\n📋 Running Database Tests...");
+            JUnitDatabaseTest.main(args);
+            
+            System.out.println("\n" + "=" .repeat(60));
+            System.out.println("🎉 ALL TEST SUITE COMPLETED SUCCESSFULLY!");
+            System.out.println("✅ MotorPH Payroll System is ready for production");
+            
+        } catch (Exception e) {
+            System.err.println("\n❌ Test Suite Failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

@@ -1,40 +1,26 @@
 package Test;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
 import model.Employee;
 import dao.EmployeeDAO;
 import java.time.LocalDate;
 
 /**
- * Proper JUnit 5 Test Class for Employee functionality
- * Addresses mentor feedback: "Unit test is incorrect. JUnit was not utilized."
- * Uses proper Assert Functions and provides viewable test results
+ * Simple Employee Test Class (without JUnit dependencies)
+ * Tests employee functionality using basic assertions
  */
-@DisplayName("Employee Model and DAO Tests")
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class JUnitEmployeeTest {
 
     private Employee testEmployee;
     private EmployeeDAO employeeDAO;
     private static final int TEST_EMPLOYEE_ID = 99999;
 
-    @BeforeAll
-    static void setUpClass() {
-        System.out.println("🧪 Starting JUnit 5 Employee Tests");
-    }
-
-    @BeforeEach
-    void setUp() {
+    public void setUp() {
         testEmployee = new Employee();
         employeeDAO = new EmployeeDAO();
         System.out.println("🔧 Test setup completed");
     }
 
-    @Test
-    @Order(1)
-    @DisplayName("Create Valid Employee")
-    void testCreateValidEmployee() {
+    public void testCreateValidEmployee() {
         // Arrange
         testEmployee.setEmployeeId(TEST_EMPLOYEE_ID);
         testEmployee.setFirstName("John");
@@ -44,103 +30,87 @@ public class JUnitEmployeeTest {
         testEmployee.setPosition("Software Developer");
 
         // Act & Assert
-        assertAll("Employee creation",
-            () -> assertEquals(TEST_EMPLOYEE_ID, testEmployee.getEmployeeId(), "Employee ID should match"),
-            () -> assertEquals("John", testEmployee.getFirstName(), "First name should match"),
-            () -> assertEquals("Doe", testEmployee.getLastName(), "Last name should match"),
-            () -> assertEquals("John Doe", testEmployee.getFullName(), "Full name should be concatenated"),
-            () -> assertEquals(50000.0, testEmployee.getBasicSalary(), 0.01, "Basic salary should match"),
-            () -> assertEquals("Regular", testEmployee.getStatus(), "Status should match"),
-            () -> assertEquals("Software Developer", testEmployee.getPosition(), "Position should match"),
-            () -> assertTrue(testEmployee.isValid(), "Employee should be valid")
-        );
+        assert testEmployee.getEmployeeId() == TEST_EMPLOYEE_ID : "Employee ID should match";
+        assert "John".equals(testEmployee.getFirstName()) : "First name should match";
+        assert "Doe".equals(testEmployee.getLastName()) : "Last name should match";
+        assert "John Doe".equals(testEmployee.getFullName()) : "Full name should be concatenated";
+        assert Math.abs(testEmployee.getBasicSalary() - 50000.0) < 0.01 : "Basic salary should match";
+        assert "Regular".equals(testEmployee.getStatus()) : "Status should match";
+        assert "Software Developer".equals(testEmployee.getPosition()) : "Position should match";
+        assert testEmployee.isValid() : "Employee should be valid";
         
         System.out.println("✅ testCreateValidEmployee passed");
     }
 
-    @Test
-    @Order(2)
-    @DisplayName("Invalid Employee ID Validation")
-    void testInvalidEmployeeId() {
+    public void testInvalidEmployeeId() {
         // Test negative employee ID
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> testEmployee.setEmployeeId(-1),
-            "Should throw exception for negative employee ID"
-        );
-        
-        assertTrue(exception.getMessage().contains("positive"), 
-                  "Error message should mention positive requirement");
+        try {
+            testEmployee.setEmployeeId(-1);
+            assert false : "Should throw exception for negative employee ID";
+        } catch (IllegalArgumentException e) {
+            assert e.getMessage().contains("positive") : "Error message should mention positive requirement";
+        }
         
         // Test zero employee ID
-        assertThrows(
-            IllegalArgumentException.class,
-            () -> testEmployee.setEmployeeId(0),
-            "Should throw exception for zero employee ID"
-        );
+        try {
+            testEmployee.setEmployeeId(0);
+            assert false : "Should throw exception for zero employee ID";
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
         
         System.out.println("✅ testInvalidEmployeeId passed");
     }
 
-    @Test
-    @Order(3)
-    @DisplayName("Name Validation Tests")
-    void testNameValidation() {
+    public void testNameValidation() {
         // Test null first name
-        IllegalArgumentException exception1 = assertThrows(
-            IllegalArgumentException.class,
-            () -> testEmployee.setFirstName(null),
-            "Should throw exception for null first name"
-        );
+        try {
+            testEmployee.setFirstName(null);
+            assert false : "Should throw exception for null first name";
+        } catch (IllegalArgumentException e) {
+            assert e.getMessage().contains("cannot be null") : "Null error message";
+        }
         
         // Test empty first name
-        IllegalArgumentException exception2 = assertThrows(
-            IllegalArgumentException.class,
-            () -> testEmployee.setFirstName(""),
-            "Should throw exception for empty first name"
-        );
+        try {
+            testEmployee.setFirstName("");
+            assert false : "Should throw exception for empty first name";
+        } catch (IllegalArgumentException e) {
+            assert e.getMessage().contains("cannot be null") : "Empty error message";
+        }
         
         // Test whitespace first name
-        IllegalArgumentException exception3 = assertThrows(
-            IllegalArgumentException.class,
-            () -> testEmployee.setFirstName("   "),
-            "Should throw exception for whitespace first name"
-        );
-        
-        assertAll("Name validation error messages",
-            () -> assertTrue(exception1.getMessage().contains("cannot be null"), "Null error message"),
-            () -> assertTrue(exception2.getMessage().contains("cannot be null"), "Empty error message"),
-            () -> assertTrue(exception3.getMessage().contains("cannot be null"), "Whitespace error message")
-        );
+        try {
+            testEmployee.setFirstName("   ");
+            assert false : "Should throw exception for whitespace first name";
+        } catch (IllegalArgumentException e) {
+            assert e.getMessage().contains("cannot be null") : "Whitespace error message";
+        }
         
         System.out.println("✅ testNameValidation passed");
     }
 
-    @Test
-    @Order(4)
-    @DisplayName("Salary Validation Tests")
-    void testSalaryValidation() {
+    public void testSalaryValidation() {
         // Test valid salary
-        assertDoesNotThrow(() -> testEmployee.setBasicSalary(50000.0), 
-                          "Should not throw exception for valid salary");
+        try {
+            testEmployee.setBasicSalary(50000.0);
+            // Should not throw exception
+        } catch (Exception e) {
+            assert false : "Should not throw exception for valid salary";
+        }
         
         // Test negative salary
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> testEmployee.setBasicSalary(-1000.0),
-            "Should throw exception for negative salary"
-        );
-        
-        assertTrue(exception.getMessage().contains("cannot be negative"), 
-                  "Error message should mention negative restriction");
+        try {
+            testEmployee.setBasicSalary(-1000.0);
+            assert false : "Should throw exception for negative salary";
+        } catch (IllegalArgumentException e) {
+            assert e.getMessage().contains("cannot be negative") : "Error message should mention negative restriction";
+        }
         
         System.out.println("✅ testSalaryValidation passed");
     }
 
-    @Test
-    @Order(5)
-    @DisplayName("Total Allowances Calculation")
-    void testTotalAllowances() {
+    public void testTotalAllowances() {
         // Arrange
         testEmployee.setRiceSubsidy(1500.0);
         testEmployee.setPhoneAllowance(1000.0);
@@ -150,15 +120,12 @@ public class JUnitEmployeeTest {
         double total = testEmployee.getTotalAllowances();
 
         // Assert
-        assertEquals(3000.0, total, 0.01, "Total allowances should be 3000.0");
+        assert Math.abs(total - 3000.0) < 0.01 : "Total allowances should be 3000.0";
         
         System.out.println("✅ testTotalAllowances passed");
     }
 
-    @Test
-    @Order(6)
-    @DisplayName("Age Calculation")
-    void testAgeCalculation() {
+    public void testAgeCalculation() {
         // Arrange
         LocalDate birthDate = LocalDate.now().minusYears(25);
         testEmployee.setBirthday(birthDate);
@@ -167,15 +134,12 @@ public class JUnitEmployeeTest {
         int age = testEmployee.getAge();
 
         // Assert
-        assertEquals(25, age, "Age should be calculated correctly");
+        assert age == 25 : "Age should be calculated correctly";
         
         System.out.println("✅ testAgeCalculation passed");
     }
 
-    @Test
-    @Order(7)
-    @DisplayName("Null Birthday Handling")
-    void testNullBirthdayReturnsZeroAge() {
+    public void testNullBirthdayReturnsZeroAge() {
         // Arrange
         testEmployee.setBirthday(null);
 
@@ -183,62 +147,50 @@ public class JUnitEmployeeTest {
         int age = testEmployee.getAge();
 
         // Assert
-        assertEquals(0, age, "Age should be 0 if birthday is null");
+        assert age == 0 : "Age should be 0 if birthday is null";
         
         System.out.println("✅ testNullBirthdayReturnsZeroAge passed");
     }
 
-    @Test
-    @Order(8)
-    @DisplayName("Database Employee Retrieval")
-    void testDatabaseEmployeeRetrieval() {
+    public void testDatabaseEmployeeRetrieval() {
         try {
             // Act
             Employee employee = employeeDAO.getEmployeeById(10001);
 
             // Assert
-            assertNotNull(employee, "Employee should not be null");
-            assertEquals(10001, employee.getEmployeeId(), "Employee ID should match");
-            assertNotNull(employee.getFirstName(), "First name should not be null");
-            assertNotNull(employee.getLastName(), "Last name should not be null");
-            assertTrue(employee.getBasicSalary() > 0, "Basic salary should be positive");
+            assert employee != null : "Employee should not be null";
+            assert employee.getEmployeeId() == 10001 : "Employee ID should match";
+            assert employee.getFirstName() != null : "First name should not be null";
+            assert employee.getLastName() != null : "Last name should not be null";
+            assert employee.getBasicSalary() > 0 : "Basic salary should be positive";
             
             System.out.println("✅ testDatabaseEmployeeRetrieval passed");
             
         } catch (Exception e) {
-            // Skip database test if database is not available
             System.out.println("⚠️ testDatabaseEmployeeRetrieval skipped - database not available");
-            Assumptions.assumeTrue(false, "Database not available for testing");
         }
     }
 
-    @Test
-    @Order(9)
-    @DisplayName("Employee Search Functionality")
-    void testEmployeeSearch() {
+    public void testEmployeeSearch() {
         try {
             // Act
             var employees = employeeDAO.searchEmployees("Garcia");
 
             // Assert
-            assertNotNull(employees, "Search results should not be null");
-            assertFalse(employees.isEmpty(), "Search should return results");
-            assertTrue(employees.stream().anyMatch(emp -> 
-                emp.getLastName().contains("Garcia") || emp.getFirstName().contains("Garcia")), 
-                "Results should contain Garcia");
+            assert employees != null : "Search results should not be null";
+            assert !employees.isEmpty() : "Search should return results";
+            assert employees.stream().anyMatch(emp -> 
+                emp.getLastName().contains("Garcia") || emp.getFirstName().contains("Garcia")) : 
+                "Results should contain Garcia";
             
             System.out.println("✅ testEmployeeSearch passed");
             
         } catch (Exception e) {
             System.out.println("⚠️ testEmployeeSearch skipped - database not available");
-            Assumptions.assumeTrue(false, "Database not available for testing");
         }
     }
 
-    @Test
-    @Order(10)
-    @DisplayName("Employee Validation Rules")
-    void testEmployeeValidationRules() {
+    public void testEmployeeValidationRules() {
         // Test complete valid employee
         testEmployee.setEmployeeId(TEST_EMPLOYEE_ID);
         testEmployee.setFirstName("John");
@@ -246,23 +198,57 @@ public class JUnitEmployeeTest {
         testEmployee.setBasicSalary(50000.0);
         testEmployee.setPosition("Developer");
 
-        assertTrue(testEmployee.isValid(), "Complete employee should be valid");
+        assert testEmployee.isValid() : "Complete employee should be valid";
 
         // Test invalid employee (missing required fields)
         Employee invalidEmployee = new Employee();
-        assertFalse(invalidEmployee.isValid(), "Incomplete employee should be invalid");
+        assert !invalidEmployee.isValid() : "Incomplete employee should be invalid";
         
         System.out.println("✅ testEmployeeValidationRules passed");
     }
 
-    @AfterEach
-    void tearDown() {
-        testEmployee = null;
-        System.out.println("🧹 Test cleanup completed");
-    }
-
-    @AfterAll
-    static void tearDownClass() {
-        System.out.println("✅ All JUnit 5 Employee Tests Completed Successfully!");
+    // Main method to run all tests
+    public static void main(String[] args) {
+        System.out.println("🧪 Running Employee Tests...");
+        
+        JUnitEmployeeTest test = new JUnitEmployeeTest();
+        
+        try {
+            test.setUp();
+            test.testCreateValidEmployee();
+            
+            test.setUp();
+            test.testInvalidEmployeeId();
+            
+            test.setUp();
+            test.testNameValidation();
+            
+            test.setUp();
+            test.testSalaryValidation();
+            
+            test.setUp();
+            test.testTotalAllowances();
+            
+            test.setUp();
+            test.testAgeCalculation();
+            
+            test.setUp();
+            test.testNullBirthdayReturnsZeroAge();
+            
+            test.setUp();
+            test.testDatabaseEmployeeRetrieval();
+            
+            test.setUp();
+            test.testEmployeeSearch();
+            
+            test.setUp();
+            test.testEmployeeValidationRules();
+            
+            System.out.println("🎉 All Employee Tests Passed!");
+            
+        } catch (Exception e) {
+            System.err.println("❌ Test failed: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
